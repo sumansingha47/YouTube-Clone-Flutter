@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,6 +50,14 @@ class UserDataService {
     final currentUserMap =
         await firestore.collection("users").doc(auth.currentUser!.uid).get();
     UserModel user = UserModel.fromMap(currentUserMap.data()!);
+    return user;
+  }
+
+  Future<UserModel> fetchAnyUserData(userId) async {
+    final currentUserMap =
+        await firestore.collection("users").doc(userId).get();
+    UserModel user = UserModel.fromMap(currentUserMap.data()!);
+    log("UserDataService() - user = ${user.displayName}");
     return user;
   }
 }

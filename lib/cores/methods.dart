@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:youtube_clone_fcc_2024/features/upload/long_video/video_details_page.dart';
 
 void showErrorSnackBar(String message, context) =>
     ScaffoldMessenger.of(context).showSnackBar(
@@ -14,12 +15,14 @@ void showErrorSnackBar(String message, context) =>
       ),
     );
 
-pickVideo() async {
+Future pickVideo(context) async {
   XFile? file = await ImagePicker().pickVideo(source: ImageSource.gallery);
   File video = File(file!.path);
-  if (video != null) {
-    return video;
-  }
+  Navigator.push(context, MaterialPageRoute(
+    builder: (context) {
+      return VideoDetailsPage(video: video);
+    },
+  ));
 }
 
 Future<File> pickImage() async {
@@ -28,7 +31,7 @@ Future<File> pickImage() async {
   return image;
 }
 
-putFileInStorage(file, number, fileType) async {
+Future<String> putFileInStorage(file, number, fileType) async {
   final ref = FirebaseStorage.instance.ref().child("$fileType/$number");
   final upload = ref.putFile(file);
   final snapshot = await upload;

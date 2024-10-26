@@ -1,20 +1,27 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import 'package:youtube_clone_fcc_2024/cores/methods.dart';
+import 'package:youtube_clone_fcc_2024/features/upload/long_video/video_repository.dart';
 
-class VideoDetailsPage extends StatefulWidget {
-  const VideoDetailsPage({super.key});
+class VideoDetailsPage extends ConsumerStatefulWidget {
+  final File? video;
+  const VideoDetailsPage({super.key, this.video});
 
   @override
-  State<VideoDetailsPage> createState() => _VideoDetailsPageState();
+  ConsumerState<VideoDetailsPage> createState() => _VideoDetailsPageState();
 }
 
-class _VideoDetailsPageState extends State<VideoDetailsPage> {
+class _VideoDetailsPageState extends ConsumerState<VideoDetailsPage> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   File? image;
   bool isThumbnailSelected = false;
+  String randomNumber = const Uuid().v4();
+  String videoId = const Uuid().v4();
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +134,25 @@ class _VideoDetailsPageState extends State<VideoDetailsPage> {
                           ),
                         ),
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            // publish video
+
+                            String thumbnail = await putFileInStorage(
+                                image, randomNumber, "image");
+
+                            String videoUrl = await putFileInStorage(
+                                widget.video, randomNumber, "video");
+
+                            ref.watch(longVideoProvider).uploadVideoToFirestore(
+                                  videoUrl: videoUrl,
+                                  thumbnail: thumbnail,
+                                  title: titleController.text,
+                                  videoId: videoId,
+                                  datePublished: DateTime.now(),
+                                  userId:
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                );
+                          },
                           child: const Text(
                             "Publish",
                             style: TextStyle(

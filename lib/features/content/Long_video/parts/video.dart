@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone_fcc_2024/cores/colors.dart';
 import 'package:youtube_clone_fcc_2024/cores/widgets/flat_button.dart';
 import 'package:youtube_clone_fcc_2024/features/content/Long_video/widgets/video_externel_buttons.dart';
+import 'package:video_editor/video_editor.dart';
 
 class Video extends StatelessWidget {
   const Video({Key? key}) : super(key: key);

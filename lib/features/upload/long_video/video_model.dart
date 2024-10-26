@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class VideoModel {
   final String videoUrl;
   final String thumbnail;
   final String title;
-  final String datePublished;
-  final String views;
+  final DateTime datePublished;
+  final int views;
   final String videoId;
   final String userId;
   final List likes;
@@ -40,8 +42,12 @@ class VideoModel {
       videoUrl: map['videoUrl'] as String,
       thumbnail: map['thumbnail'] as String,
       title: map['title'] as String,
-      datePublished: map['datePublished'] as String,
-      views: map['views'] as String,
+      datePublished: map["datePublished"] is Timestamp
+          ? (map["datePublished"] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(
+              map["datePublished"] as int,
+            ),
+      views: map["views"] as int,
       videoId: map['videoId'] as String,
       userId: map['userId'] as String,
       likes: List.from(

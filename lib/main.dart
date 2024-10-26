@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                 return const Loader();
               }
 
-              return VideoDetailsPage();
+              return HomePage();
             },
           );
         },
