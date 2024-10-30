@@ -14,6 +14,7 @@ import 'package:youtube_clone_fcc_2024/features/auth/provider/user_provider.dart
 import 'package:youtube_clone_fcc_2024/features/content/Long_video/parts/post.dart';
 import 'package:youtube_clone_fcc_2024/features/content/Long_video/widgets/video_externel_buttons.dart';
 import 'package:video_editor/video_editor.dart';
+import 'package:youtube_clone_fcc_2024/features/content/comment/comment_sheet.dart';
 import 'package:youtube_clone_fcc_2024/features/upload/long_video/video_model.dart';
 
 class Video extends ConsumerStatefulWidget {
@@ -317,6 +318,31 @@ class _VideoState extends ConsumerState<Video> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+
+            // comment box
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => CommentSheet(
+                      video: widget.video,
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8),
+                      )),
+                  height: 45,
+                  width: MediaQuery.of(context).size.width,
                 ),
               ),
             ),
