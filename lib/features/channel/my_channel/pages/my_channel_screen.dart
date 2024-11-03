@@ -31,7 +31,7 @@ class MyChannelScreen extends ConsumerWidget {
                       // create tab bar
 
                       const PageTabBar(),
-                      TabPages(),
+                      const TabPages(),
                     ],
                   ),
                 ),

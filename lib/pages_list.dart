@@ -4,16 +4,13 @@ import 'package:youtube_clone_fcc_2024/features/content/short_video/pages/short_
 import 'package:youtube_clone_fcc_2024/features/search/pages/search_screen.dart';
 
 const pages = [
-  SearchScreen(),
   LongVideoScreen(),
   ShortVideoPage(),
   Center(
     child: Text("upload"),
   ),
+  SearchScreen(),
   Center(
     child: Text("upload"),
-  ),
-  Center(
-    child: Text("Home"),
   ),
 ];
