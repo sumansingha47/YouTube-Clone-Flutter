@@ -1,7 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -11,11 +14,17 @@ import 'package:youtube_clone_fcc_2024/cores/screens/loader.dart';
 import 'package:youtube_clone_fcc_2024/cores/widgets/flat_button.dart';
 import 'package:youtube_clone_fcc_2024/features/auth/model/user_model.dart';
 import 'package:youtube_clone_fcc_2024/features/auth/provider/user_provider.dart';
+import 'package:youtube_clone_fcc_2024/features/channel/users_channel/subscribe_repository.dart';
 import 'package:youtube_clone_fcc_2024/features/content/Long_video/parts/post.dart';
 import 'package:youtube_clone_fcc_2024/features/content/Long_video/widgets/video_externel_buttons.dart';
 import 'package:video_editor/video_editor.dart';
+import 'package:youtube_clone_fcc_2024/features/content/Long_video/widgets/video_first_comment.dart';
+import 'package:youtube_clone_fcc_2024/features/content/comment/comment_provider.dart';
 import 'package:youtube_clone_fcc_2024/features/content/comment/comment_sheet.dart';
+import 'package:youtube_clone_fcc_2024/features/upload/comments/comment_model.dart';
+import 'package:youtube_clone_fcc_2024/features/upload/comments/comment_repository.dart';
 import 'package:youtube_clone_fcc_2024/features/upload/long_video/video_model.dart';
+import 'package:youtube_clone_fcc_2024/features/upload/long_video/video_repository.dart';
 
 class Video extends ConsumerStatefulWidget {
   final VideoModel video;
@@ -63,6 +72,14 @@ class _VideoState extends ConsumerState<Video> {
     Duration position = _controller!.value.position;
     position = position + Duration(seconds: 1);
     _controller!.seekTo(position);
+  }
+
+  likeVideo() async {
+    await ref.watch(longVideoProvider).likeVideo(
+          currentUserId: FirebaseAuth.instance.currentUser!.uid,
+          likes: widget.video.likes,
+          videoId: widget.video.videoId,
+        );
   }
 
   @override
@@ -257,7 +274,17 @@ class _VideoState extends ConsumerState<Video> {
                       padding: const EdgeInsets.only(right: 6),
                       child: FlatButton(
                         text: "Subscribe",
-                        onPressed: () {},
+                        onPressed: () async {
+                          // subscribe channel
+                          await ref
+                              .watch(subscribeChannelProvider)
+                              .subscribeChannel(
+                                userId: user.value!.userId,
+                                currentUserId:
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                subscriptions: user.value!.subscriptions,
+                              );
+                        },
                         colour: Colors.black,
                       ),
                     ),
@@ -285,12 +312,20 @@ class _VideoState extends ConsumerState<Video> {
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              likeVideo();
+                            },
                             child: Icon(
                               Icons.thumb_up,
+                              color: widget.video.likes.contains(
+                                      FirebaseAuth.instance.currentUser!.uid)
+                                  ? Colors.blue
+                                  : Colors.black,
                               size: 15.5,
                             ),
                           ),
+                          const SizedBox(width: 5),
+                          Text("${widget.video.likes.length}"),
                           const SizedBox(width: 19),
                           const Icon(
                             Icons.thumb_down,
@@ -341,8 +376,26 @@ class _VideoState extends ConsumerState<Video> {
                       borderRadius: BorderRadius.all(
                         Radius.circular(8),
                       )),
-                  height: 45,
+                  height: MediaQuery.of(context).size.width / 6,
                   width: MediaQuery.of(context).size.width,
+                  child: Consumer(builder: (context, ref, child) {
+                    final AsyncValue<List<CommentModel>> comments = ref.watch(
+                      commentsProvider(widget.video.videoId),
+                    );
+
+                    log("video.dart - comments.value - ${comments.value}");
+
+                    if (comments.value == null) {
+                      return const SizedBox(
+                        height: 20,
+                      );
+                    }
+
+                    return VideoFirstComment(
+                      comments: comments.value!,
+                      user: user.value!,
+                    );
+                  }),
                 ),
               ),
             ),

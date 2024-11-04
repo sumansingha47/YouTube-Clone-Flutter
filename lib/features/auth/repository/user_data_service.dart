@@ -29,13 +29,19 @@ class UserDataService {
     required String description,
     required String profilePic,
   }) async {
+    final videosMap = await FirebaseFirestore.instance
+        .collection("videos")
+        .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    final videos = videosMap.docs;
+
     UserModel user = UserModel(
       displayName: displayName,
       username: username,
       email: email,
       profilePic: profilePic,
       subscriptions: [],
-      videos: 0,
+      videos: videos.length,
       userId: auth.currentUser!.uid,
       description: description,
       type: "user",
